@@ -1,0 +1,32 @@
+
+## this computes a structured-informed PLS
+## the current implementation is very naive, but should get the job done
+## I'm only going to return the new scores for X... this is all I care about right now
+## H corresponds to sample-wise structure that is common to X and Y
+## Q is parameter-wise structure on X
+pls_gmd <- function(X, Y, H, Q, k)
+{
+  Xk <- X
+  Yk <- Y
+  T <- matrix(0, nrow(X), k)
+  for (i in 1:k)
+  {
+    svd.out <- svd(Q %*% t(Xk) %*% H %*% Yk, nu = 1, nv = 1) # compute the weights, this is the slowest part
+    tk <- Xk %*% svd.out$u[,1] # new latent variable for X
+    if (is.vector(Y)) # latent variable for Y, checking to see if Y is a vector to avoid conformability errors
+      uk <- Yk * svd.out$v[1,1]
+    else
+      uk <- Yk %*% svd.out$v[,1]
+    pk <- t(Xk) %*% tk / (t(tk) %*% tk)[1,1]
+    Xk <- Xk - tk %*% t(pk) # deflate X
+    b <- t(tk) %*% uk / (t(tk) %*% tk)[1,1] # b is the coefficient found when fitting the model u = bt
+    if (is.vector(Y)) # deflate Y using the linear model fit
+      Yk <- Yk - b[1,1] * tk * svd.out$v[1,1]
+    else
+      Yk <- Yk - b[1,1] * tk %*% t(svd.out$v[,1])
+    T[,i] <- tk # save the latent variable tk
+  }
+
+  return(T)
+
+}
