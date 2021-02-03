@@ -1,4 +1,4 @@
-#' Kernel-weighted partial least squares
+#' Partial least squares with the generalized matrix decomposition
 #'
 #' @param X The n by p data matrix of predictors
 #' @param Y The n by q matrix of outcomes
@@ -8,7 +8,7 @@
 #' @param k Integer, the number of PLS latent variables to compute.
 #' @return Scores and loadings for X and Y.
 #' @export
-kwpls <- function(X, Y, H = diag(nrow(X)), Q1 = diag(ncol(X)), Q2 = diag(ncol(Y)), k = 2)
+plsgmd <- function(X, Y, H = diag(nrow(X)), Q1 = diag(ncol(X)), Q2 = diag(ncol(Y)), k = 2)
 {
   Xj <- X
   Yj <- Y
